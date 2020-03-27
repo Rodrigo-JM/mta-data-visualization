@@ -1,0 +1,29 @@
+{
+  "name": "mta-requests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "express": "^4.17.1",
+    "gtfs-realtime-bindings": "0.0.5",
+    "html-react-parser": "^0.10.2",
+    "html-template-tag": "^3.2.0",
+    "morgan": "^1.10.0",
+    "mta-gtfs": "^1.1.0",
+    "node-fetch": "^2.6.0",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "concurrently": "^5.1.0",
+    "nodemon": "^2.0.2"
+  }
+}
