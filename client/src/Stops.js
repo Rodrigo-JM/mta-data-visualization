@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { getStops } from "./store";
+import { getStops, getSchedule } from "./store";
 import { connect } from "react-redux";
 import parse from "html-react-parser";
 
@@ -10,13 +10,20 @@ class Stops extends Component {
 
   render() {
     return (
-      <div id="container">
-        {this.props.stops.map(stop => (
-          <div>
-            <h1>Stops</h1>
-            {Object.keys(stop).map(key => (<p>{stop[key]}</p>))}
-          </div>
-        ))}
+      <div>
+        <button
+          onClick={() => this.props.getSchedule(this.props.stops)}
+        ></button>
+        <div id="container">
+          {this.props.stops.map(stop => (
+            <div>
+              <h1>Stops</h1>
+              {Object.keys(stop).map(key => (
+                <p>{`${key}: ${stop[key]}`}</p>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -24,12 +31,14 @@ class Stops extends Component {
 
 const mapStateToProps = state => {
   return {
-    stops: state.stops
+    stops: state.stops,
+    schedule: state.schedule
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
+    getSchedule: stops => dispatch(getSchedule(stops)),
     getSubwayStops: () => dispatch(getStops())
   };
 };

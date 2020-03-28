@@ -5,12 +5,37 @@ import {createLogger} from 'redux-logger'
 
 const initialState = {
     status: [],
-    stops: []
+    stops: [],
+    schedule: [],
 }
+
 
 const GOT_STATUS = 'GOT_STATUS';
 const GOT_STOPS = 'GOT_STOPS';
+const GOT_SCHEDULE = 'GOT_SCHEDULE';
 
+const gotSchedule = (schedule) => {
+    return {
+        type: GOT_SCHEDULE,
+        schedule,
+    }
+}
+
+
+export const getSchedule = (stops) => {
+    return async function (dispatch) {
+        const stopIds = stops.reduce((accum, stop) => {
+            accum = [...accum, stop.stop_id];
+            return accum;
+        }, [])
+        const body = {
+            stops: stopIds[0]
+        }
+        const { data } = await axios.post('/api/schedule', body)
+
+        dispatch(gotSchedule(data))
+    }
+}
 const gotStops = (stops) => {
     return {
         type: GOT_STOPS,
@@ -53,6 +78,11 @@ const reducer = (state = initialState, action) => {
                 stops: Object.keys(action.stops).map(key => {
                     return action.stops[key]
                 })
+            }
+        case GOT_SCHEDULE:
+            return {
+                ...state,
+                schedule: action.schedule 
             }
         default: 
             return state;
