@@ -14,5 +14,14 @@ router.get('/status/:category', async (req, res, next) => {
     }
 })
 
+router.get('/stops', async (req, res, next) => {
+    try {
+        const stops = await mta.stop()
+        res.send(stops)
+    } catch(err) {
+        next(err)
+    }
+})
+
 
 module.exports = router

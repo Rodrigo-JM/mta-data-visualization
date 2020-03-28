@@ -20,6 +20,11 @@
     "morgan": "^1.10.0",
     "mta-gtfs": "^1.1.0",
     "node-fetch": "^2.6.0",
+    "react-redux": "^7.2.0",
+    "react-router-dom": "^5.1.2",
+    "redux": "^4.0.5",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0",
     "request": "^2.88.2"
   },
   "devDependencies": {
