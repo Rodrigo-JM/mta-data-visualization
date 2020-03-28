@@ -5,6 +5,8 @@ import SubwayStatus from './SubwayStatus'
 import { BrowserRouter, Link, Route } from 'react-router-dom'
 import Navbar from './Navbar'
 import Stops from './Stops';
+import Schedule from './Schedule'
+
 class App extends Component {
 
   render() {
@@ -13,6 +15,7 @@ class App extends Component {
         <Route path='/' component={Navbar} />
         <Route path="/status" component={SubwayStatus} />
         <Route path='/stops' component={Stops} />
+        <Route path='/schedule' component={Schedule} />
       </BrowserRouter>
     )
   }

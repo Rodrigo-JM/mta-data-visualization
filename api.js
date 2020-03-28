@@ -1,3 +1,6 @@
+var GtfsRealtimeBindings = require('gtfs-realtime-bindings');
+var request = require('request');
+
 const router = require('express').Router();
 const Mta = require('mta-gtfs');
 const mta = new Mta({
@@ -24,10 +27,19 @@ router.get('/stops', async (req, res, next) => {
 
 router.post('/schedule', async (req, res, next) => {
     try {
-        console.log(req.body)
-        const schedule = await mta.schedule(req.body.stops);
-        console.log(schedule)
-        res.send(schedule)
+        let feedFiltered;
+        var requestSettings = {
+                method: 'GET',
+                url: 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace',
+                encoding: null,
+                headers: {'x-api-key': 'R3mKf9CSXg6LrjjJ79n4H57EjY1apVGl8MiyhRvY'}
+            }
+          
+        feedFiltered = request(requestSettings, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            let feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(body)
+            res.send(feed)
+        }})
     } catch(err) {
         next(err)
     }
