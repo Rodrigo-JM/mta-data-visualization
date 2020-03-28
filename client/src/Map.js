@@ -35,6 +35,11 @@ const material = {
   specularColor: [60, 64, 70],
 };
 
+const mapBorders = {
+  width: '100vw',
+  height: '100vh'
+}
+
 const DEFAULT_THEME = {
   buildingColor: [74, 80, 87],
   trailColor0: [253, 128, 93],
@@ -153,6 +158,7 @@ export default class App extends Component {
         initialViewState={INITIAL_VIEW_STATE}
         viewState={viewState}
         controller={true}
+        style={mapBorders}
       >
         <StaticMap
           reuseMaps
