@@ -1,6 +1,5 @@
 /* global window */
 import React, { Component } from 'react';
-import { render } from 'react-dom';
 import { StaticMap } from 'react-map-gl';
 import { AmbientLight, PointLight, LightingEffect } from '@deck.gl/core';
 import DeckGL from '@deck.gl/react';
@@ -11,25 +10,24 @@ import { TripsLayer } from '@deck.gl/geo-layers';
 const DATA_URL = {
   BUILDINGS:
     'https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/trips/buildings.json', // eslint-disable-line
-  TRIPS:
-    'https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/trips/trips-v7.json', // eslint-disable-line
+  TRIPS: require('./traindata.json'), // eslint-disable-line
 };
 
 const ambientLight = new AmbientLight({
   color: [255, 255, 255],
-  intensity: 1.0,
+  intensity: 0.0,
 });
 
 const pointLight = new PointLight({
   color: [255, 255, 255],
-  intensity: 2.0,
+  intensity: 20,
   position: [-74.05, 40.7, 8000],
 });
 
 const lightingEffect = new LightingEffect({ ambientLight, pointLight });
 
 const material = {
-  ambient: 0.1,
+  ambient: 1.0,
   diffuse: 0.6,
   shininess: 32,
   specularColor: [60, 64, 70],
@@ -86,7 +84,7 @@ export default class App extends Component {
   _animate() {
     const {
       loopLength = 1800, // unit corresponds to the timestamp in source data
-      animationSpeed = 30, // unit time per second
+      animationSpeed = 25, // unit time per second
     } = this.props;
     const timestamp = Date.now() / 1000;
     const loopTime = loopLength / animationSpeed;
@@ -103,7 +101,7 @@ export default class App extends Component {
     const {
       buildings = DATA_URL.BUILDINGS,
       trips = DATA_URL.TRIPS,
-      trailLength = 180,
+      trailLength = 1000,
       theme = DEFAULT_THEME,
     } = this.props;
 
@@ -122,13 +120,13 @@ export default class App extends Component {
         getPath: d => d.path,
         getTimestamps: d => d.timestamps,
         getColor: d => (d.vendor === 0 ? theme.trailColor0 : theme.trailColor1),
-        opacity: 0.3,
-        widthMinPixels: 2,
+        opacity: 1,
+        widthMinPixels: 25,
         rounded: true,
         trailLength,
         currentTime: this.state.time,
 
-        shadowEnabled: false,
+        shadowEnabled: true,
       }),
       new PolygonLayer({
         id: 'buildings',
@@ -172,8 +170,3 @@ export default class App extends Component {
     );
   }
 }
-
-// export function renderToDOM(container) {
-//   render(<App />, container);
-// }
-// ß;

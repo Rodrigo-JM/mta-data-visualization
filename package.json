@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "concurrently": "^5.1.0",
+    "convert-csv-to-json": "0.0.15",
     "nodemon": "^2.0.2"
   }
 }
