@@ -13,6 +13,7 @@ const DATA_URL = {
   TRIPS: require('./traindata.json'), // eslint-disable-line
 };
 
+
 const ambientLight = new AmbientLight({
   color: [255, 255, 255],
   intensity: 0.0,
@@ -101,10 +102,10 @@ export default class App extends Component {
     const {
       buildings = DATA_URL.BUILDINGS,
       trips = DATA_URL.TRIPS,
-      trailLength = 1000,
+      trailLength = 250,
       theme = DEFAULT_THEME,
     } = this.props;
-
+    console.log(trips)
     return [
       // This is only needed when using shadow effects
       new PolygonLayer({

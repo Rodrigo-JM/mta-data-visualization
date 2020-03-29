@@ -15,8 +15,8 @@ class Schedule extends Component {
       path: trip.tripUpdate.stopTimeUpdate.reduce((accum, trip) => {
         if (this.props.stops[trip.stopId] !== undefined) {
           const stopCoordinates = [
+            parseFloat(this.props.stops[trip.stopId].stop_lon),
             parseFloat(this.props.stops[trip.stopId].stop_lat),
-            parseFloat(this.props.stops[trip.stopId].stop_lon)
           ];
           accum.push(stopCoordinates);
         }
@@ -28,7 +28,7 @@ class Schedule extends Component {
               const actualTime = parseInt(trip.departure.time)
               const futureTime = parseInt(arr[index + 1].arrival.time)
               const difference = ((futureTime - actualTime) > 0) ? futureTime - actualTime : 0; 
-              accum.push(difference * 1000);
+              accum.push(100);
           }
 
           return accum;

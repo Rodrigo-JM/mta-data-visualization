@@ -13,7 +13,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Route path='/' component={Navbar} />
-        <Route path='/' component={Map} />
+        <Route exact path='/' component={Map} />
         <Route path="/status" component={SubwayStatus} />
         {/* <Route path='/stops' component={Stops} /> */}
         <Route path='/schedule' component={Schedule} />
