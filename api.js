@@ -25,12 +25,13 @@ router.get('/stops', async (req, res, next) => {
     }
 })
 
-router.post('/schedule', async (req, res, next) => {
+router.post('/schedule/', async (req, res, next) => {
     try {
+        
         let feedFiltered;
         var requestSettings = {
                 method: 'GET',
-                url: 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace',
+                url: req.body.url,
                 encoding: null,
                 headers: {'x-api-key': 'R3mKf9CSXg6LrjjJ79n4H57EjY1apVGl8MiyhRvY'}
             }
@@ -38,6 +39,7 @@ router.post('/schedule', async (req, res, next) => {
         feedFiltered = request(requestSettings, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             let feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(body)
+            console.log(feed)
             res.send(feed)
         }})
     } catch(err) {

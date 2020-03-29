@@ -14,7 +14,7 @@ class App extends Component {
       <BrowserRouter>
         <Route path='/' component={Navbar} />
         <Route path="/status" component={SubwayStatus} />
-        <Route path='/stops' component={Stops} />
+        {/* <Route path='/stops' component={Stops} /> */}
         <Route path='/schedule' component={Schedule} />
       </BrowserRouter>
     )

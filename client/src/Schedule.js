@@ -3,33 +3,59 @@ import { getStops, getSchedule } from "./store";
 import { connect } from "react-redux";
 import parse from "html-react-parser";
 
-// const recursivePrint = obj => {
-//     Object.keys(schedule).map(key => {
-//         if ()
-//         `<p>${key}: ${schedule[key]}</p>`
-//     })
-      
-// }
-
 class Schedule extends Component {
   //   componentDidMount() {
   //     this.props.getSubwayStops();
   //   }
 
+  formatForMap(trip) {
+    console.log(trip);
+    return {
+      vendor: trip.tripUpdate.trip.routeId,
+      path: trip.tripUpdate.stopTimeUpdate.reduce((accum, trip) => {
+        if (this.props.stops[trip.stopId] !== undefined) {
+          const stopCoordinates = [
+            parseFloat(this.props.stops[trip.stopId].stop_lat),
+            parseFloat(this.props.stops[trip.stopId].stop_lon)
+          ];
+          accum.push(stopCoordinates);
+        }
+
+        return accum;
+      }, []),
+      timestamps: trip.tripUpdate.stopTimeUpdate.reduce((accum, trip, index, arr) => {
+          if ((index + 1) < arr.length) {
+              const actualTime = parseInt(trip.departure.time)
+              const futureTime = parseInt(arr[index + 1].arrival.time)
+              const difference = ((futureTime - actualTime) > 0) ? futureTime - actualTime : 0; 
+              accum.push(difference * 1000);
+          }
+
+          return accum;
+      }, [])
+    };
+  }
+
   render() {
     return (
       <div>
         <div id="container">
-          {!this.props.schedule.entity ? (
-            <h1>Go to stops and press the button...</h1>
+          {!this.props.schedule.length ? (
+            <h1>Select a line...</h1>
           ) : (
-            this.props.schedule.entity.map(stop => (
-              <div>
-                <h1>Schedule</h1>
-                {JSON.stringify(stop).replace(/\,/g, "\n")}
-              </div>
-            ))
-          )}    
+            this.props.schedule[0].entity.map(trip => {
+              if (trip.tripUpdate !== undefined) {
+                if (trip.tripUpdate.stopTimeUpdate !== undefined) {
+                  return (
+                    <div>
+                      <h1>Trip {trip.id}</h1>
+                      {JSON.stringify(this.formatForMap(trip))}
+                    </div>
+                  );
+                }
+              }
+            })
+          )}
         </div>
       </div>
     );
