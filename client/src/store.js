@@ -36,37 +36,39 @@ const linesRelationToUrlArr = [
 const GOT_STATUS = 'GOT_STATUS';
 const GOT_STOPS = 'GOT_STOPS';
 const GOT_SCHEDULE = 'GOT_SCHEDULE';
-const WROTE_LINE = 'WROTE_FILE'
+const GOT_LINES = 'GOT_LINES'
 
-const wroteLine = () => {
+const gotLines = lines => {
     return {
-        type: WROTE_LINE
+        type: GOT_LINES,
+        lines
     }
 }
 
-// const writeFile = (content) => {
-//     return async function(dispatch) {
-//         const { data }
-//     }
-// }
 
+export const getLines = () => {
+    return async function(dispatch) {
+        const {data} = await axios.get('/api/routes');
+        console.log(data, 'LINESSSSSSSSSSSSSSSSSSSSSSS')
+        dispatch(gotLines(data))
+    }
+}
 
-const gotSchedule = (line, schedule) => {
+const gotSchedule = (schedule) => {
     return {
         type: GOT_SCHEDULE,
-        schedule,
-        line,
+        schedule
     }
 }
 
 
-export const getSchedule = (line) => {
+export const getSchedule = () => {
     return async function (dispatch) {
-        const body = { url : linesUrl[linesRelationToUrlArr[line]]}
+        // const body = { url : linesUrl[linesRelationToUrlArr[line]]}
 
         const { data } = await axios.get(`/api/schedule/`)
 
-        // dispatch(gotSchedule(line, data))
+        dispatch(gotSchedule(data))
     }
 }
 const gotStops = (stops) => {
@@ -112,10 +114,15 @@ const reducer = (state = initialState, action) => {
             }
         case GOT_SCHEDULE:
             // const newSchedule = {...state.schedule}
-            
+            console.log('GOT_SCHEDULE')
             return {
                 ...state,
-                schedule: [...state.schedule, action.schedule]
+                schedule: action.schedule
+            }
+        case GOT_LINES:
+            return {
+                ...state,
+                lines: action.lines
             }
         default: 
             return state;

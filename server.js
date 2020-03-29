@@ -6,7 +6,7 @@ const { db } = require('./db/db')
 app.use(morgan('dev'));
 app.use(express.json())
 app.use('/api', apiRouter)
-db.sync();
-// db.sync({force: true})
+// db.sync();
+db.sync()
 app.listen(8080)
 

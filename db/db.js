@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const databaseUrl = process.env.DATABASE_URL || 'postgres://localhost:5432/mtaroutes'
+const databaseUrl = process.env.DATABASE_URL || 'postgres://localhost:5432/mtaroutesvisualization'
 const db = new Sequelize(databaseUrl, {
     logging: false,
 })
@@ -7,12 +7,14 @@ const db = new Sequelize(databaseUrl, {
 
 const Route = db.define('route', {
     name: {
-        type: Sequelize.STRING,
+       type: Sequelize.STRING,
+       unique: true
     },
     line: {
         type: Sequelize.ARRAY(Sequelize.JSON)
     }
 })
+
 
 
 module.exports = {

@@ -5,6 +5,7 @@ import { AmbientLight, PointLight, LightingEffect } from '@deck.gl/core';
 import DeckGL from '@deck.gl/react';
 import { PolygonLayer } from '@deck.gl/layers';
 import { TripsLayer } from '@deck.gl/geo-layers';
+import { connect } from 'react-redux';
 
 // Source data CSV
 const DATA_URL = {
@@ -64,7 +65,7 @@ const landCover = [
   ],
 ];
 
-export default class App extends Component {
+class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -84,7 +85,7 @@ export default class App extends Component {
 
   _animate() {
     const {
-      loopLength = 1800, // unit corresponds to the timestamp in source data
+      loopLength = 18000, // unit corresponds to the timestamp in source data
       animationSpeed = 25, // unit time per second
     } = this.props;
     const timestamp = Date.now() / 1000;
@@ -102,7 +103,7 @@ export default class App extends Component {
     const {
       buildings = DATA_URL.BUILDINGS,
       trips = DATA_URL.TRIPS,
-      trailLength = 250,
+      trailLength = 2500,
       theme = DEFAULT_THEME,
     } = this.props;
     return [
@@ -116,10 +117,10 @@ export default class App extends Component {
       }),
       new TripsLayer({
         id: 'trips',
-        data: trips,
+        data: this.props.lines,
         getPath: d => d.path,
         getTimestamps: d => d.timestamps,
-        getColor: d => (d.vendor === 0 ? theme.trailColor0 : theme.trailColor1),
+        getColor: d => theme.trailColor0,
         opacity: 1,
         widthMinPixels: 2 ,
         rounded: true,
@@ -170,3 +171,11 @@ export default class App extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    lines: state.lines,
+  }
+}
+
+export default connect(mapStateToProps)(Map)

@@ -2,6 +2,7 @@ var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 var request = require("request");
 const requestPromise = require("request-promise");
 const { db, Route } = require("./db/db");
+const Sequelize = require('sequelize')
 const router = require("express").Router();
 const Mta = require("mta-gtfs");
 const mta = new Mta({
@@ -18,7 +19,7 @@ const formatForMap = (trip, stops) => {
           parseFloat(stops[trip.stopId].stop_lon),
           parseFloat(stops[trip.stopId].stop_lat)
         ];
-        accum.push(stopCoordinates * 20);
+        accum.push(stopCoordinates);
       }
 
       return accum;
@@ -30,7 +31,7 @@ const formatForMap = (trip, stops) => {
           const futureTime = parseInt(arr[index + 1].arrival.time);
           const difference =
             futureTime - actualTime > 0 ? futureTime - actualTime : 0;
-          accum.push(difference);
+          accum.push( difference* 10);
         }
 
         return accum;
@@ -66,18 +67,21 @@ router.get("/display", async (req, res, next) => {
   }
 });
 
-router.get('/routes', async (req, res, next) => {
-    try {
-        const routes = await Route.findAll();
-        const allLines = routes.reduce((accum, singleRoute) => {
-            accum = [...accum, ...singleRoute.line]
-            return accum;
-        }, [])
-        res.send(allLines)
-    } catch(err) {
-        next(err)
-    }
-})
+router.get("/routes", async (req, res, next) => {
+  try {
+    const routes = await Route.findAll();
+    const allLines = routes
+      .reduce((accum, singleRoute) => {
+        accum = [...accum, ...singleRoute.line];
+        return accum;
+      }, [])
+      .filter(line => (!line.path.includes(null) && line.path.length));
+
+    res.send(allLines);
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.get("/schedule/", async (req, res, next) => {
   // this endpoint gets all stops, then we get all lines and we combine them make our Route model
@@ -108,13 +112,13 @@ router.get("/schedule/", async (req, res, next) => {
       "7"
     ];
 
-    const allRequests = await (new Promise((resolve, reject) => {
+    const allRequests = await new Promise((resolve, reject) => {
       linesUrl.forEach(async (routeUrl, index) => {
         let lineJson = {
           name: linesRelationToUrlArr[index],
           line: []
         }; //here we initialize the lineJson to later write it to the database
-        console.log(lineJson)
+        console.log(lineJson);
         var requestSettings = {
           method: "GET",
           url: routeUrl,
@@ -127,7 +131,7 @@ router.get("/schedule/", async (req, res, next) => {
           response,
           body
         ) {
-          const waitForPromise = await (new Promise(async (resolve, reject) => {
+          const waitForPromise = await new Promise(async (resolve, reject) => {
             if (!error && response.statusCode == 200) {
               let feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
                 body
@@ -143,24 +147,39 @@ router.get("/schedule/", async (req, res, next) => {
                   }
                 }
               });
-              route = await Route.create(lineJson);
-              console.log(route)
+              route = { ...lineJson };
+              console.log(route);
             }
             if (route) {
               resolve();
             } else if (error) {
-                console.log(error)
+              console.log(error);
             }
-          }));
+          });
         });
         routes = [...routes, route];
         if (routes.length === 8) {
-            resolve();
-          }
+          resolve();
+        }
       });
-      
-      
-    }));
+    });
+    // console.log(routes);
+    routes.forEach(async route => {
+      try {
+        const data = await Route.findAll();
+        if (!data.length) {
+          await Route.create(route);
+        } else {
+          await Route.update(route, {
+            where: {
+              name: route.name
+            }
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
     res.send(routes);
   } catch (err) {
     next(err);

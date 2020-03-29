@@ -1,25 +1,46 @@
 import './App.css';
-import axios from 'axios';
 import React, { Component } from 'react';
-import SubwayStatus from './SubwayStatus';
 import { BrowserRouter, Link, Route } from 'react-router-dom';
-import Navbar from './Navbar';
 import Map from './Map';
-import Stops from './Stops';
-import Schedule from './Schedule'
+import { getSchedule, getLines } from './store'
+import { connect } from 'react-redux'
 
 class App extends Component {
+
+  componentDidMount() {
+    this.props.getSchedule();
+    setInterval(() => this.props.getSchedule(), 60000)
+   
+  }
+
+  componentDidUpdate() {
+    this.props.getLines();
+  }
+
   render() {
     return (
       <BrowserRouter>
-        <Route path='/' component={Navbar} />
+        {/* <Route path='/' component={Navbar} /> */}
         <Route exact path='/' component={Map} />
-        <Route path="/status" component={SubwayStatus} />
+        {/* <Route path="/status" component={SubwayStatus} />
         {/* <Route path='/stops' component={Stops} /> */}
-        <Route path='/schedule' component={Schedule} />
+        {/* <Route path='/schedule' component={Schedule} /> */} 
       </BrowserRouter>
     )
   }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    schedule: state.schedule
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+      getLines: () => dispatch(getLines()),
+      getSchedule: () => dispatch(getSchedule()),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
