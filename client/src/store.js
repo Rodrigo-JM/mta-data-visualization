@@ -6,34 +6,51 @@ import {createLogger} from 'redux-logger'
 const initialState = {
     status: [],
     stops: [],
-    schedule: [],
+    schedule: []
 }
 
+const linesUrl = [
+    'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace', //A C E
+    'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm', // B D F M
+    'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g', // G
+    'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz', // J Z
+    'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw', // N Q R W
+    'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l', // L
+    'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs', //  1 2 3 4 5 6 
+    'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-7' //7
+]
+
+const linesRelationToUrlArr = {
+    'a_c_e': 0,
+    'b_d_f_m': 1,
+    'g': 2,
+    'j_z': 3,
+    'n_q_r_w': 4,
+    'l': 5,
+    '1_2_3_4_5_6': 6,
+    '7': 7 
+}
 
 const GOT_STATUS = 'GOT_STATUS';
 const GOT_STOPS = 'GOT_STOPS';
 const GOT_SCHEDULE = 'GOT_SCHEDULE';
 
-const gotSchedule = (schedule) => {
+const gotSchedule = (line, schedule) => {
     return {
         type: GOT_SCHEDULE,
         schedule,
+        line,
     }
 }
 
 
-export const getSchedule = (stops) => {
+export const getSchedule = (line) => {
     return async function (dispatch) {
-        const stopIds = stops.reduce((accum, stop) => {
-            accum = [...accum, stop.stop_id];
-            return accum;
-        }, [])
-        const body = {
-            stops: stopIds[0]
-        }
-        const { data } = await axios.post('/api/schedule', body)
+        const body = { url : linesUrl[linesRelationToUrlArr[line]]}
 
-        dispatch(gotSchedule(data))
+        const { data } = await axios.post(`/api/schedule/`, body)
+
+        dispatch(gotSchedule(line, data))
     }
 }
 const gotStops = (stops) => {
@@ -75,14 +92,14 @@ const reducer = (state = initialState, action) => {
         case GOT_STOPS: 
             return {
                 ...state,
-                stops: Object.keys(action.stops).map(key => {
-                    return action.stops[key]
-                })
+                stops: action.stops 
             }
         case GOT_SCHEDULE:
+            // const newSchedule = {...state.schedule}
+            
             return {
                 ...state,
-                schedule: action.schedule 
+                schedule: [...state.schedule, action.schedule]
             }
         default: 
             return state;

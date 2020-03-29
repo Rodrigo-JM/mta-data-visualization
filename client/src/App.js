@@ -6,9 +6,19 @@ import { BrowserRouter, Link, Route } from 'react-router-dom';
 import Navbar from './Navbar';
 import Map from './Map';
 import Stops from './Stops';
+import Schedule from './Schedule'
+
 class App extends Component {
   render() {
-    return <Map />;
+    return (
+      <BrowserRouter>
+        <Route path='/' component={Navbar} />
+        <Route path='/' component={Map} />
+        <Route path="/status" component={SubwayStatus} />
+        {/* <Route path='/stops' component={Stops} /> */}
+        <Route path='/schedule' component={Schedule} />
+      </BrowserRouter>
+    )
   }
 }
 
