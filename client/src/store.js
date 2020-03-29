@@ -6,7 +6,8 @@ import {createLogger} from 'redux-logger'
 const initialState = {
     status: [],
     stops: [],
-    schedule: []
+    schedule: [],
+    lines: [],
 }
 
 const linesUrl = [
@@ -20,20 +21,35 @@ const linesUrl = [
     'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-7' //7
 ]
 
-const linesRelationToUrlArr = {
-    'a_c_e': 0,
-    'b_d_f_m': 1,
-    'g': 2,
-    'j_z': 3,
-    'n_q_r_w': 4,
-    'l': 5,
-    '1_2_3_4_5_6': 6,
-    '7': 7 
-}
+const linesRelationToUrlArr = [
+    'a_c_e',
+    'b_d_f_m',
+    'g',
+    'j_z',
+    'n_q_r_w',
+    'l',
+    '1_2_3_4_5_6',
+    '7',
+]
+
 
 const GOT_STATUS = 'GOT_STATUS';
 const GOT_STOPS = 'GOT_STOPS';
 const GOT_SCHEDULE = 'GOT_SCHEDULE';
+const WROTE_LINE = 'WROTE_FILE'
+
+const wroteLine = () => {
+    return {
+        type: WROTE_LINE
+    }
+}
+
+// const writeFile = (content) => {
+//     return async function(dispatch) {
+//         const { data }
+//     }
+// }
+
 
 const gotSchedule = (line, schedule) => {
     return {
@@ -48,9 +64,9 @@ export const getSchedule = (line) => {
     return async function (dispatch) {
         const body = { url : linesUrl[linesRelationToUrlArr[line]]}
 
-        const { data } = await axios.post(`/api/schedule/`, body)
+        const { data } = await axios.get(`/api/schedule/`)
 
-        dispatch(gotSchedule(line, data))
+        // dispatch(gotSchedule(line, data))
     }
 }
 const gotStops = (stops) => {

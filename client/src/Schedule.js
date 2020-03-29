@@ -5,9 +5,6 @@ import parse from "html-react-parser";
 
 class Schedule extends Component {
   //   componentDidMount() {
-  //     this.props.getSubwayStops();
-  //   }
-
   formatForMap(trip) {
     console.log(trip);
     return {
@@ -28,7 +25,7 @@ class Schedule extends Component {
               const actualTime = parseInt(trip.departure.time)
               const futureTime = parseInt(arr[index + 1].arrival.time)
               const difference = ((futureTime - actualTime) > 0) ? futureTime - actualTime : 0; 
-              accum.push(100);
+              accum.push(difference);
           }
 
           return accum;
@@ -43,13 +40,13 @@ class Schedule extends Component {
           {!this.props.schedule.length ? (
             <h1>Select a line...</h1>
           ) : (
-            this.props.schedule[0].entity.map(trip => {
+            this.props.schedule[this.props.schedule.length - 1].entity.map(trip => {
               if (trip.tripUpdate !== undefined) {
                 if (trip.tripUpdate.stopTimeUpdate !== undefined) {
                   return (
                     <div>
                       <h1>Trip {trip.id}</h1>
-                      {JSON.stringify(this.formatForMap(trip))}
+                      {JSON.stringify(trip)}
                     </div>
                   );
                 }

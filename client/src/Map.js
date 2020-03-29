@@ -105,7 +105,6 @@ export default class App extends Component {
       trailLength = 250,
       theme = DEFAULT_THEME,
     } = this.props;
-    console.log(trips)
     return [
       // This is only needed when using shadow effects
       new PolygonLayer({
@@ -122,7 +121,7 @@ export default class App extends Component {
         getTimestamps: d => d.timestamps,
         getColor: d => (d.vendor === 0 ? theme.trailColor0 : theme.trailColor1),
         opacity: 1,
-        widthMinPixels: 25,
+        widthMinPixels: 2 ,
         rounded: true,
         trailLength,
         currentTime: this.state.time,
