@@ -10,7 +10,7 @@ import { TripsLayer } from '@deck.gl/geo-layers';
 const DATA_URL = {
   BUILDINGS:
     'https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/trips/buildings.json', // eslint-disable-line
-  TRIPS: require('./traindata.json'), // eslint-disable-line
+  TRIPS: require('./trips-v7.json'), // eslint-disable-line
 };
 
 const ambientLight = new AmbientLight({
@@ -96,7 +96,7 @@ export default class App extends Component {
     const {
       buildings = DATA_URL.BUILDINGS,
       trips = DATA_URL.TRIPS,
-      trailLength = 1000,
+      trailLength = 120,
       theme = DEFAULT_THEME,
     } = this.props;
 
