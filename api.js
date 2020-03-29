@@ -18,7 +18,7 @@ const formatForMap = (trip, stops) => {
           parseFloat(stops[trip.stopId].stop_lon),
           parseFloat(stops[trip.stopId].stop_lat)
         ];
-        accum.push(stopCoordinates);
+        accum.push(stopCoordinates * 20);
       }
 
       return accum;
@@ -69,8 +69,11 @@ router.get("/display", async (req, res, next) => {
 router.get('/routes', async (req, res, next) => {
     try {
         const routes = await Route.findAll();
-
-        res.send(routes)
+        const allLines = routes.reduce((accum, singleRoute) => {
+            accum = [...accum, ...singleRoute.line]
+            return accum;
+        }, [])
+        res.send(allLines)
     } catch(err) {
         next(err)
     }
@@ -124,7 +127,7 @@ router.get("/schedule/", async (req, res, next) => {
           response,
           body
         ) {
-          const waitForPromise = await new Promise(async (resolve, reject) => {
+          const waitForPromise = await (new Promise(async (resolve, reject) => {
             if (!error && response.statusCode == 200) {
               let feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
                 body
@@ -148,7 +151,7 @@ router.get("/schedule/", async (req, res, next) => {
             } else if (error) {
                 console.log(error)
             }
-          });
+          }));
         });
         routes = [...routes, route];
         if (routes.length === 8) {
