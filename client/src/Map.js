@@ -5,38 +5,58 @@ import { AmbientLight, PointLight, LightingEffect } from '@deck.gl/core';
 import DeckGL from '@deck.gl/react';
 import { PolygonLayer } from '@deck.gl/layers';
 import { TripsLayer } from '@deck.gl/geo-layers';
+import { connect } from 'react-redux';
+import GL from '@luma.gl/constants';
 
 // Source data CSV
 const DATA_URL = {
   BUILDINGS:
     'https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/trips/buildings.json', // eslint-disable-line
-  TRIPS: require('./trips-v7.json'), // eslint-disable-line
 };
 
 const ambientLight = new AmbientLight({
   color: [255, 255, 255],
-  intensity: 0.0,
+  intensity: 1.0,
 });
 
 const pointLight = new PointLight({
   color: [255, 255, 255],
-  intensity: 20,
+  intensity: 7,
   position: [-74.05, 40.7, 8000],
 });
 
 const lightingEffect = new LightingEffect({ ambientLight, pointLight });
 
 const material = {
-  ambient: 1.0,
+  ambient: 1,
   diffuse: 0.6,
-  shininess: 32,
-  specularColor: [60, 64, 70],
+  shininess: 10,
+  specularColor: [55, 64, 70],
+};
+
+const mapBorders = {
+  width: '100vw',
+  height: '100vh',
 };
 
 const DEFAULT_THEME = {
-  buildingColor: [74, 80, 87],
-  trailColor0: [253, 128, 93],
-  trailColor1: [23, 184, 190],
+  buildingColor: [35, 35, 35],
+  trailColor1: [255, 116, 0],
+  trailColor: {
+    J: [236, 79, 0],
+    D: [255, 116, 0],
+    N: [236, 236, 0],
+    Q: [236, 236, 0],
+    R: [236, 236, 0],
+    A: [0, 175, 235],
+    E: [0, 175, 235],
+    H: [0, 200, 235],
+    F: [255, 116, 0],
+    FS: [255, 116, 0],
+    7: [197, 0, 236],
+    G: [0, 255, 39],
+    L: [235, 235, 235],
+  },
   material,
   effects: [lightingEffect],
 };
@@ -58,7 +78,7 @@ const landCover = [
   ],
 ];
 
-export default class App extends Component {
+class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -78,8 +98,8 @@ export default class App extends Component {
 
   _animate() {
     const {
-      loopLength = 1800, // unit corresponds to the timestamp in source data
-      animationSpeed = 25, // unit time per second
+      loopLength = 4000, // unit corresponds to the timestamp in source data
+      animationSpeed = 15, // unit time per second
     } = this.props;
     const timestamp = Date.now() / 1000;
     const loopTime = loopLength / animationSpeed;
@@ -95,13 +115,11 @@ export default class App extends Component {
   _renderLayers() {
     const {
       buildings = DATA_URL.BUILDINGS,
-      trips = DATA_URL.TRIPS,
-      trailLength = 120,
+      trailLength = 1000,
       theme = DEFAULT_THEME,
     } = this.props;
 
     return [
-      // This is only needed when using shadow effects
       new PolygonLayer({
         id: 'ground',
         data: landCover,
@@ -111,24 +129,25 @@ export default class App extends Component {
       }),
       new TripsLayer({
         id: 'trips',
-        data: trips,
+        data: this.props.lines,
         getPath: d => d.path,
         getTimestamps: d => d.timestamps,
-        getColor: d => (d.vendor === 0 ? theme.trailColor0 : theme.trailColor1),
-        opacity: 1,
-        widthMinPixels: 25,
-        rounded: true,
+        getColor: d => theme.trailColor1,
+        // /theme.trailColor[d.vendor],
+        opacity: 0.2,
+        widthMinPixels: 6,
+        rounded: false,
         trailLength,
         currentTime: this.state.time,
 
-        shadowEnabled: true,
+        shadowEnabled: false,
       }),
       new PolygonLayer({
         id: 'buildings',
         data: buildings,
         extruded: true,
         wireframe: false,
-        opacity: 0.5,
+        opacity: 0.7,
         getPolygon: f => f.polygon,
         getElevation: f => f.height,
         getFillColor: theme.buildingColor,
@@ -140,7 +159,7 @@ export default class App extends Component {
   render() {
     const {
       viewState,
-      mapStyle = 'mapbox://styles/mapbox/dark-v9',
+      mapStyle = 'mapbox://styles/bjlmckelway/ck8df7aqb0q661is3wxma06lt',
       theme = DEFAULT_THEME,
     } = this.props;
 
@@ -151,6 +170,12 @@ export default class App extends Component {
         initialViewState={INITIAL_VIEW_STATE}
         viewState={viewState}
         controller={true}
+        style={mapBorders}
+        parameters={{
+          clearColor: [0.1, 0.2, 0.2, 0.2],
+          blendFunc: [GL.SRC_ALPHA, GL.ONE, GL.ONE_MINUS_DST_ALPHA, GL.ONE],
+          blendEquation: GL.FUNC_MULTIPLY,
+        }}
       >
         <StaticMap
           reuseMaps
@@ -164,3 +189,11 @@ export default class App extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    lines: state.lines,
+  };
+};
+
+export default connect(mapStateToProps)(Map);
