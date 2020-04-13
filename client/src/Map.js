@@ -183,7 +183,7 @@ class Map extends Component {
         controller={true}
         style={mapBorders}
         parameters={{
-          clearColor: [0.1, 0.2, 0.2, 0.2],
+          clearColor: [0, 0.1, 0.1, 0.1],
           // blendColor: [1, 0, 0, 0.1],
           // blendFunc: [GL.SRC_ALPHA, GL.ONE, GL.ONE_MINUS_DST_ALPHA, GL.ONE],
           // blendEquation: GL.FUNC_ADD,

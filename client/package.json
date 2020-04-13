@@ -20,6 +20,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-map-gl": "^5.0.0",
+    "react-player": "^1.15.3",
     "react-scripts": "3.4.1",
     "react-simple-audio-player": "^2.0.0"
   },
