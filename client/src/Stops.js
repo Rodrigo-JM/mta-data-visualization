@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
-import { getStops, getSchedule } from './store';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import { getStops, getSchedule } from "./store";
+import { connect } from "react-redux";
+import parse from "html-react-parser";
 
 class Stops extends Component {
   componentDidMount() {
@@ -31,14 +32,14 @@ class Stops extends Component {
 const mapStateToProps = state => {
   return {
     stops: state.stops,
-    schedule: state.schedule,
+    schedule: state.schedule
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     getSchedule: stops => dispatch(getSchedule(stops)),
-    getSubwayStops: () => dispatch(getStops()),
+    getSubwayStops: () => dispatch(getStops())
   };
 };
 

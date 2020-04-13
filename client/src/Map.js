@@ -14,24 +14,37 @@ const DATA_URL = {
     'https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/trips/buildings.json', // eslint-disable-line
 };
 
+const findColor = (object, lineLetter) => {
+  for (let routes in object) {
+    if (routes.indexOf(lineLetter.toLowerCase()) > -1) {
+      return object[routes];
+    }
+  }
+};
+
+const timestampsForCurrentTime = (timestamps, currentTime) => {
+  const initialTime = timestamps[0];
+  return timestamps.map((timestamp) => currentTime + timestamp - initialTime);
+};
+
 const ambientLight = new AmbientLight({
   color: [255, 255, 255],
-  intensity: 1.0,
+  intensity: 0.0,
 });
 
 const pointLight = new PointLight({
   color: [255, 255, 255],
-  intensity: 7,
+  intensity: 20,
   position: [-74.05, 40.7, 8000],
 });
 
 const lightingEffect = new LightingEffect({ ambientLight, pointLight });
 
 const material = {
-  ambient: 1,
+  ambient: 1.0,
   diffuse: 0.6,
-  shininess: 10,
-  specularColor: [55, 64, 70],
+  shininess: 32,
+  specularColor: [60, 64, 70],
 };
 
 const mapBorders = {
@@ -40,23 +53,20 @@ const mapBorders = {
 };
 
 const DEFAULT_THEME = {
-  buildingColor: [35, 35, 35],
-  trailColor1: [255, 116, 0],
-  trailColor: {
-    J: [236, 79, 0],
-    D: [255, 116, 0],
-    N: [236, 236, 0],
-    Q: [236, 236, 0],
-    R: [236, 236, 0],
-    A: [0, 175, 235],
-    E: [0, 175, 235],
-    H: [0, 200, 235],
-    F: [255, 116, 0],
-    FS: [255, 116, 0],
-    7: [197, 0, 236],
-    G: [0, 255, 39],
-    L: [235, 235, 235],
+  buildingColor: [74, 80, 87],
+  trailColors: {
+    a_c_e: [0, 175, 245],
+    b_d_f_m: [255, 116, 0],
+    g: [0, 255, 39],
+    j_z: [236, 79, 0],
+    n_q_r_w: [236, 236, 0],
+    l: [235, 235, 235],
+    '1_2_3': [245, 50, 50],
+    '4_5_6': [0, 200, 100],
+    '7': [197, 0, 236],
   },
+  trailColor0: [253, 128, 93],
+  trailColor1: [23, 184, 190],
   material,
   effects: [lightingEffect],
 };
@@ -98,8 +108,8 @@ class Map extends Component {
 
   _animate() {
     const {
-      loopLength = 4000, // unit corresponds to the timestamp in source data
-      animationSpeed = 15, // unit time per second
+      loopLength = 86400, // unit corresponds to the timestamp in source data
+      animationSpeed = 1, // unit time per second
     } = this.props;
     const timestamp = Date.now() / 1000;
     const loopTime = loopLength / animationSpeed;
@@ -107,6 +117,7 @@ class Map extends Component {
     this.setState({
       time: ((timestamp % loopTime) / loopTime) * loopLength,
     });
+
     this._animationFrame = window.requestAnimationFrame(
       this._animate.bind(this)
     );
@@ -115,32 +126,32 @@ class Map extends Component {
   _renderLayers() {
     const {
       buildings = DATA_URL.BUILDINGS,
-      trailLength = 1000,
+      trailLength = 1500,
       theme = DEFAULT_THEME,
     } = this.props;
-
     return [
+      // This is only needed when using shadow effects
       new PolygonLayer({
         id: 'ground',
         data: landCover,
-        getPolygon: f => f,
+        getPolygon: (f) => f,
         stroked: false,
         getFillColor: [0, 0, 0, 0],
       }),
       new TripsLayer({
         id: 'trips',
         data: this.props.lines,
-        getPath: d => d.path,
-        getTimestamps: d => d.timestamps,
-        getColor: d => theme.trailColor1,
-        // /theme.trailColor[d.vendor],
-        opacity: 0.2,
-        widthMinPixels: 6,
-        rounded: false,
+        getPath: (d) => d.path,
+        getTimestamps: (d) =>
+          timestampsForCurrentTime(d.timestamps, this.state.time),
+        getColor: (d) => findColor(theme.trailColors, d.vendor),
+        opacity: 0.5,
+        widthMinPixels: 5,
+        rounded: true,
         trailLength,
         currentTime: this.state.time,
 
-        shadowEnabled: false,
+        shadowEnabled: true,
       }),
       new PolygonLayer({
         id: 'buildings',
@@ -148,8 +159,8 @@ class Map extends Component {
         extruded: true,
         wireframe: false,
         opacity: 0.7,
-        getPolygon: f => f.polygon,
-        getElevation: f => f.height,
+        getPolygon: (f) => f.polygon,
+        getElevation: (f) => f.height,
         getFillColor: theme.buildingColor,
         material: theme.material,
       }),
@@ -173,8 +184,9 @@ class Map extends Component {
         style={mapBorders}
         parameters={{
           clearColor: [0.1, 0.2, 0.2, 0.2],
-          blendFunc: [GL.SRC_ALPHA, GL.ONE, GL.ONE_MINUS_DST_ALPHA, GL.ONE],
-          blendEquation: GL.FUNC_MULTIPLY,
+          // blendColor: [1, 0, 0, 0.1],
+          // blendFunc: [GL.SRC_ALPHA, GL.ONE, GL.ONE_MINUS_DST_ALPHA, GL.ONE],
+          // blendEquation: GL.FUNC_ADD,
         }}
       >
         <StaticMap
@@ -190,7 +202,7 @@ class Map extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     lines: state.lines,
   };

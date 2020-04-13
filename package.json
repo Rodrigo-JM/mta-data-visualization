@@ -13,7 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.2",
-    "chroma-js": "^2.1.0",
     "express": "^4.17.1",
     "gtfs-realtime-bindings": "0.0.5",
     "html-react-parser": "^0.10.2",
@@ -21,7 +20,7 @@
     "morgan": "^1.10.0",
     "mta-gtfs": "^1.1.0",
     "node-fetch": "^2.6.0",
-    "pg": "^7.18.2",
+    "pg": "^8.0.2",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
     "redux": "^4.0.5",

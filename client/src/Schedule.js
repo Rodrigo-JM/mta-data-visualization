@@ -1,8 +1,10 @@
-import React, { Component } from 'react';
-import { getStops, getSchedule } from './store';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import { getStops, getSchedule } from "./store";
+import { connect } from "react-redux";
+import parse from "html-react-parser";
 
 class Schedule extends Component {
+  //   componentDidMount() {
   formatForMap(trip) {
     console.log(trip);
     return {
@@ -18,20 +20,16 @@ class Schedule extends Component {
 
         return accum;
       }, []),
-      timestamps: trip.tripUpdate.stopTimeUpdate.reduce(
-        (accum, trip, index, arr) => {
-          if (index + 1 < arr.length) {
-            const actualTime = parseInt(trip.departure.time);
-            const futureTime = parseInt(arr[index + 1].arrival.time);
-            const difference =
-              futureTime - actualTime > 0 ? futureTime - actualTime : 0;
-            accum.push(difference);
+      timestamps: trip.tripUpdate.stopTimeUpdate.reduce((accum, trip, index, arr) => {
+          if ((index + 1) < arr.length) {
+              const actualTime = parseInt(trip.departure.time)
+              const futureTime = parseInt(arr[index + 1].arrival.time)
+              const difference = ((futureTime - actualTime) > 0) ? futureTime - actualTime : 0; 
+              accum.push(difference);
           }
 
           return accum;
-        },
-        []
-      ),
+      }, [])
     };
   }
 
@@ -42,20 +40,18 @@ class Schedule extends Component {
           {!this.props.schedule.length ? (
             <h1>Select a line...</h1>
           ) : (
-            this.props.schedule[this.props.schedule.length - 1].entity.map(
-              trip => {
-                if (trip.tripUpdate !== undefined) {
-                  if (trip.tripUpdate.stopTimeUpdate !== undefined) {
-                    return (
-                      <div>
-                        <h1>Trip {trip.id}</h1>
-                        {JSON.stringify(trip)}
-                      </div>
-                    );
-                  }
+            this.props.schedule[this.props.schedule.length - 1].entity.map(trip => {
+              if (trip.tripUpdate !== undefined) {
+                if (trip.tripUpdate.stopTimeUpdate !== undefined) {
+                  return (
+                    <div>
+                      <h1>Trip {trip.id}</h1>
+                      {JSON.stringify(trip)}
+                    </div>
+                  );
                 }
               }
-            )
+            })
           )}
         </div>
       </div>
@@ -66,14 +62,14 @@ class Schedule extends Component {
 const mapStateToProps = state => {
   return {
     stops: state.stops,
-    schedule: state.schedule,
+    schedule: state.schedule
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     getSchedule: stops => dispatch(getSchedule(stops)),
-    getSubwayStops: () => dispatch(getStops()),
+    getSubwayStops: () => dispatch(getStops())
   };
 };
 

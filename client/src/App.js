@@ -19,20 +19,24 @@ class App extends Component {
   render() {
     return (
       <BrowserRouter>
+        {/* <Route path='/' component={Navbar} /> */}
         <Route path="/" component={Audio} />
         <Route exact path="/" component={Map} />
+        {/* <Route path="/status" component={SubwayStatus} />
+        {/* <Route path='/stops' component={Stops} /> */}
+        {/* <Route path='/schedule' component={Schedule} /> */}
       </BrowserRouter>
     );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     schedule: state.schedule,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     getLines: () => dispatch(getLines()),
     getSchedule: () => dispatch(getSchedule()),
