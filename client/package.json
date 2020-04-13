@@ -10,14 +10,15 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
-    "deck.gl": "^8.1.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-map-gl": "^5.0.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@tweenjs/tween.js": "^18.5.0",
+    "deck.gl": "^8.1.1",
     "merge-package.json": "^3.1.6",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-map-gl": "^5.0.0",
     "react-scripts": "3.4.1"
   },
   "devDependencies": {
@@ -44,5 +45,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8000"
+  "proxy": "http://localhost:8080"
 }

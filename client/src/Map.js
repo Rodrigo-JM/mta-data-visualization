@@ -1,17 +1,30 @@
 /* global window */
-import React, { Component } from 'react';
-import { StaticMap } from 'react-map-gl';
-import { AmbientLight, PointLight, LightingEffect } from '@deck.gl/core';
-import DeckGL from '@deck.gl/react';
-import { PolygonLayer } from '@deck.gl/layers';
-import { TripsLayer } from '@deck.gl/geo-layers';
+import React, { Component } from "react";
+import { StaticMap } from "react-map-gl";
+import { AmbientLight, PointLight, LightingEffect } from "@deck.gl/core";
+import DeckGL from "@deck.gl/react";
+import { PolygonLayer } from "@deck.gl/layers";
+import { TripsLayer } from "@deck.gl/geo-layers";
+import { connect } from "react-redux";
 
 // Source data CSV
 const DATA_URL = {
   BUILDINGS:
-    'https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/trips/buildings.json', // eslint-disable-line
-  TRIPS: require('./trips-v7.json'), // eslint-disable-line
+    "https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/trips/buildings.json", // eslint-disable-line
 };
+
+const findColor = (object, lineLetter) => {
+  for (let routes in object) {
+    if (routes.indexOf(lineLetter.toLowerCase()) > -1) {
+      return object[routes]
+    }
+  }
+}
+
+const timestampsForCurrentTime = (timestamps, currentTime) => {
+  const initialTime = timestamps[0]
+  return timestamps.map(timestamp => currentTime + timestamp - initialTime)
+}
 
 const ambientLight = new AmbientLight({
   color: [255, 255, 255],
@@ -33,8 +46,24 @@ const material = {
   specularColor: [60, 64, 70],
 };
 
+const mapBorders = {
+  width: "100vw",
+  height: "100vh",
+};
+
 const DEFAULT_THEME = {
   buildingColor: [74, 80, 87],
+  trailColors: {
+    a_c_e: [0, 57, 166],
+    b_d_f_m: [253, 128, 93],
+    g: [108, 190, 69],
+    j_z: [153, 102, 51],
+    n_q_r_w: [252, 204, 10],
+    l: [167, 169, 172],
+    '1_2_3': [238, 53, 46],
+    '4_5_6': [0, 147, 60],
+    '7': [185, 51, 173],
+  },
   trailColor0: [253, 128, 93],
   trailColor1: [23, 184, 190],
   material,
@@ -58,7 +87,7 @@ const landCover = [
   ],
 ];
 
-export default class App extends Component {
+class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -78,8 +107,8 @@ export default class App extends Component {
 
   _animate() {
     const {
-      loopLength = 1800, // unit corresponds to the timestamp in source data
-      animationSpeed = 25, // unit time per second
+      loopLength = 86400, // unit corresponds to the timestamp in source data
+      animationSpeed = 1, // unit time per second
     } = this.props;
     const timestamp = Date.now() / 1000;
     const loopTime = loopLength / animationSpeed;
@@ -87,6 +116,7 @@ export default class App extends Component {
     this.setState({
       time: ((timestamp % loopTime) / loopTime) * loopLength,
     });
+
     this._animationFrame = window.requestAnimationFrame(
       this._animate.bind(this)
     );
@@ -95,28 +125,26 @@ export default class App extends Component {
   _renderLayers() {
     const {
       buildings = DATA_URL.BUILDINGS,
-      trips = DATA_URL.TRIPS,
-      trailLength = 120,
+      trailLength = 1500,
       theme = DEFAULT_THEME,
     } = this.props;
-
     return [
       // This is only needed when using shadow effects
       new PolygonLayer({
-        id: 'ground',
+        id: "ground",
         data: landCover,
-        getPolygon: f => f,
+        getPolygon: (f) => f,
         stroked: false,
         getFillColor: [0, 0, 0, 0],
       }),
       new TripsLayer({
-        id: 'trips',
-        data: trips,
-        getPath: d => d.path,
-        getTimestamps: d => d.timestamps,
-        getColor: d => (d.vendor === 0 ? theme.trailColor0 : theme.trailColor1),
+        id: "trips",
+        data: this.props.lines,
+        getPath: (d) => d.path,
+        getTimestamps: (d) =>  timestampsForCurrentTime(d.timestamps, this.state.time),
+        getColor: (d) => findColor(theme.trailColors, d.vendor),
         opacity: 1,
-        widthMinPixels: 25,
+        widthMinPixels: 2,
         rounded: true,
         trailLength,
         currentTime: this.state.time,
@@ -124,13 +152,13 @@ export default class App extends Component {
         shadowEnabled: true,
       }),
       new PolygonLayer({
-        id: 'buildings',
+        id: "buildings",
         data: buildings,
         extruded: true,
         wireframe: false,
         opacity: 0.5,
-        getPolygon: f => f.polygon,
-        getElevation: f => f.height,
+        getPolygon: (f) => f.polygon,
+        getElevation: (f) => f.height,
         getFillColor: theme.buildingColor,
         material: theme.material,
       }),
@@ -140,7 +168,7 @@ export default class App extends Component {
   render() {
     const {
       viewState,
-      mapStyle = 'mapbox://styles/mapbox/dark-v9',
+      mapStyle = "mapbox://styles/mapbox/dark-v9",
       theme = DEFAULT_THEME,
     } = this.props;
 
@@ -151,16 +179,25 @@ export default class App extends Component {
         initialViewState={INITIAL_VIEW_STATE}
         viewState={viewState}
         controller={true}
+        style={mapBorders}
       >
         <StaticMap
           reuseMaps
           mapStyle={mapStyle}
           preventStyleDiffing={true}
           mapboxApiAccessToken={
-            'pk.eyJ1IjoiYmpsbWNrZWx3YXkiLCJhIjoiY2s3dW9ubGU1MDY4MjNkbW4zaHIxcDRheCJ9.c3HiQrOPIJZXgK-sC_qhcg'
+            "pk.eyJ1IjoiYmpsbWNrZWx3YXkiLCJhIjoiY2s3dW9ubGU1MDY4MjNkbW4zaHIxcDRheCJ9.c3HiQrOPIJZXgK-sC_qhcg"
           }
         />
       </DeckGL>
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    lines: state.lines,
+  };
+};
+
+export default connect(mapStateToProps)(Map);
