@@ -9,7 +9,7 @@ class App extends Component {
 
   componentDidMount() {
     this.props.getSchedule();
-    setInterval(() => this.props.getSchedule(), 60000)
+    setInterval(() => this.props.getSchedule(), 900000)
    
   }
 

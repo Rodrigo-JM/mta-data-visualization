@@ -23,7 +23,8 @@ const findColor = (object, lineLetter) => {
 
 const timestampsForCurrentTime = (timestamps, currentTime) => {
   const initialTime = timestamps[0]
-  return timestamps.map(timestamp => currentTime + timestamp - initialTime)
+  // console.log(curren)
+  return timestamps.map(timestamp => currentTime + ((timestamp - initialTime) % 86400))
 }
 
 const ambientLight = new AmbientLight({
