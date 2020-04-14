@@ -24,7 +24,10 @@ const findColor = (object, lineLetter) => {
 
 const timestampsForCurrentTime = (timestamps, currentTime) => {
   const initialTime = timestamps[0];
-  return timestamps.map((timestamp) => currentTime + timestamp - initialTime);
+  // console.log(curren)
+  return timestamps.map(
+    (timestamp) => currentTime + ((timestamp - initialTime) % 86400)
+  );
 };
 
 const ambientLight = new AmbientLight({
@@ -65,7 +68,7 @@ const DEFAULT_THEME = {
     '4_5_6': [0, 200, 100],
     '7': [197, 0, 236],
   },
-  trailColor0: [253, 128, 93],
+  trailColor0: [255, 116, 0],
   trailColor1: [23, 184, 190],
   material,
   effects: [lightingEffect],
@@ -126,7 +129,7 @@ class Map extends Component {
   _renderLayers() {
     const {
       buildings = DATA_URL.BUILDINGS,
-      trailLength = 1500,
+      trailLength = 300,
       theme = DEFAULT_THEME,
     } = this.props;
     return [
@@ -144,8 +147,8 @@ class Map extends Component {
         getPath: (d) => d.path,
         getTimestamps: (d) =>
           timestampsForCurrentTime(d.timestamps, this.state.time),
-        getColor: (d) => findColor(theme.trailColors, d.vendor),
-        opacity: 0.5,
+        getColor: (d) => theme.trailColor0,
+        opacity: 0.7,
         widthMinPixels: 5,
         rounded: true,
         trailLength,
@@ -183,10 +186,10 @@ class Map extends Component {
         controller={true}
         style={mapBorders}
         parameters={{
-          clearColor: [0, 0.1, 0.1, 0.1],
+          clearColor: [0, 0.2, 0.2, 0.2],
           // blendColor: [1, 0, 0, 0.1],
-          // blendFunc: [GL.SRC_ALPHA, GL.ONE, GL.ONE_MINUS_DST_ALPHA, GL.ONE],
-          // blendEquation: GL.FUNC_ADD,
+          blendFunc: [GL.SRC_ALPHA, GL.ONE, GL.ONE_MINUS_DST_ALPHA, GL.ONE],
+          blendEquation: GL.FUNC_ADD,
         }}
       >
         <StaticMap

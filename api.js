@@ -1,12 +1,12 @@
-var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
-var request = require("request");
-const requestPromise = require("request-promise");
-const { db, Route } = require("./db/db");
-const Sequelize = require('sequelize')
-const router = require("express").Router();
-const Mta = require("mta-gtfs");
+var GtfsRealtimeBindings = require('gtfs-realtime-bindings');
+var request = require('request');
+const requestPromise = require('request-promise');
+const { db, Route } = require('./db/db');
+const Sequelize = require('sequelize');
+const router = require('express').Router();
+const Mta = require('mta-gtfs');
 const mta = new Mta({
-  key: "R3mKf9CSXg6LrjjJ79n4H57EjY1apVGl8MiyhRvY" // optional, default = 1
+  key: 'R3mKf9CSXg6LrjjJ79n4H57EjY1apVGl8MiyhRvY', // optional, default = 1
 });
 
 const formatForMap = (trip, stops) => {
@@ -17,7 +17,7 @@ const formatForMap = (trip, stops) => {
       if (stops[trip.stopId] !== undefined) {
         const stopCoordinates = [
           parseFloat(stops[trip.stopId].stop_lon),
-          parseFloat(stops[trip.stopId].stop_lat)
+          parseFloat(stops[trip.stopId].stop_lat),
         ];
         accum.push(stopCoordinates);
       }
@@ -26,22 +26,26 @@ const formatForMap = (trip, stops) => {
     }, []),
     timestamps: trip.tripUpdate.stopTimeUpdate.reduce(
       (accum, trip, index, arr) => {
-        // if (index < arr.length) {
-          const actualTime = parseInt(trip.departure.time);
-        //   const futureTime = parseInt(arr[index + 1].arrival.time);
-        //   const difference =
-        //     futureTime - actualTime > 0 ? futureTime - actualTime : 0;
+        if (trip && (trip.departure || trip.arrival)) {
+          let actualTime;
+
+          if (!trip.departure) {
+            actualTime = parseInt(trip.arrival.time.low);
+          } else {
+            actualTime = parseInt(trip.departure.time.low);
+          }
+
           accum.push(actualTime);
-        // }
+        }
 
         return accum;
       },
       []
-    )
+    ),
   };
 };
 
-router.get("/status/:category", async (req, res, next) => {
+router.get('/status/:category', async (req, res, next) => {
   try {
     const result = await mta.status(req.params.category);
     res.send(result);
@@ -50,7 +54,7 @@ router.get("/status/:category", async (req, res, next) => {
   }
 });
 
-router.get("/stops", async (req, res, next) => {
+router.get('/stops', async (req, res, next) => {
   try {
     const stops = await mta.stop();
     res.send(stops);
@@ -59,7 +63,7 @@ router.get("/stops", async (req, res, next) => {
   }
 });
 
-router.get("/display", async (req, res, next) => {
+router.get('/display', async (req, res, next) => {
   try {
     const routes = await Routes.findAll();
   } catch (err) {
@@ -67,7 +71,7 @@ router.get("/display", async (req, res, next) => {
   }
 });
 
-router.get("/routes", async (req, res, next) => {
+router.get('/routes', async (req, res, next) => {
   try {
     const routes = await Route.findAll();
     const allLines = routes
@@ -75,7 +79,7 @@ router.get("/routes", async (req, res, next) => {
         accum = [...accum, ...singleRoute.line];
         return accum;
       }, [])
-      .filter(line => (!line.path.includes(null) && line.path.length));
+      .filter((line) => !line.path.includes(null) && line.path.length);
 
     res.send(allLines);
   } catch (err) {
@@ -83,7 +87,7 @@ router.get("/routes", async (req, res, next) => {
   }
 });
 
-router.get("/schedule/", async (req, res, next) => {
+router.get('/schedule/', async (req, res, next) => {
   // this endpoint gets all stops, then we get all lines and we combine them make our Route model
   try {
     let routes = [];
@@ -91,41 +95,41 @@ router.get("/schedule/", async (req, res, next) => {
     const stops = await mta.stop();
 
     const linesUrl = [
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace", //A C E
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm", // B D F M
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g", // G
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz", // J Z
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw", // N Q R W
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l", // L
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs", //  1 2 3 4 5 6
-      "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-7" //7
+      'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace', //A C E
+      'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm', // B D F M
+      'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g', // G
+      'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz', // J Z
+      'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw', // N Q R W
+      'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l', // L
+      'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs', //  1 2 3 4 5 6
+      'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-7', //7
     ];
 
     const linesRelationToUrlArr = [
-      "a_c_e",
-      "b_d_f_m",
-      "g",
-      "j_z",
-      "n_q_r_w",
-      "l",
-      "1_2_3_4_5_6",
-      "7"
+      'a_c_e',
+      'b_d_f_m',
+      'g',
+      'j_z',
+      'n_q_r_w',
+      'l',
+      '1_2_3_4_5_6',
+      '7',
     ];
 
     const allRequests = await new Promise((resolve, reject) => {
       linesUrl.forEach(async (routeUrl, index) => {
         let lineJson = {
           name: linesRelationToUrlArr[index],
-          line: []
+          line: [],
         }; //here we initialize the lineJson to later write it to the database
         var requestSettings = {
-          method: "GET",
+          method: 'GET',
           url: routeUrl,
           encoding: null,
-          headers: { "x-api-key": "R3mKf9CSXg6LrjjJ79n4H57EjY1apVGl8MiyhRvY" }
+          headers: { 'x-api-key': 'R3mKf9CSXg6LrjjJ79n4H57EjY1apVGl8MiyhRvY' },
         };
 
-        await requestPromise(requestSettings, async function(
+        await requestPromise(requestSettings, async function (
           error,
           response,
           body
@@ -135,13 +139,13 @@ router.get("/schedule/", async (req, res, next) => {
               let feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
                 body
               );
-              feed.entity.map(trip => {
+              feed.entity.map((trip) => {
                 //after we get the feed, we need to map over it, conditionally find entities that have the data that we want(stops and timestamps)
                 if (trip.tripUpdate) {
                   if (trip.tripUpdate.stopTimeUpdate !== undefined) {
                     lineJson.line = [
                       ...lineJson.line,
-                      formatForMap(trip, stops)
+                      formatForMap(trip, stops),
                     ];
                   }
                 }
@@ -162,7 +166,7 @@ router.get("/schedule/", async (req, res, next) => {
       });
     });
     // console.log(routes);
-    routes.forEach(async route => {
+    routes.forEach(async (route) => {
       try {
         const data = await Route.findAll();
         if (!data.length) {
@@ -170,8 +174,8 @@ router.get("/schedule/", async (req, res, next) => {
         } else {
           await Route.update(route, {
             where: {
-              name: route.name
-            }
+              name: route.name,
+            },
           });
         }
       } catch (error) {

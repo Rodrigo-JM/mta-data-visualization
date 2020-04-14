@@ -4,8 +4,7 @@ import { BrowserRouter, Link, Route } from 'react-router-dom';
 import Map from './Map';
 import { getSchedule, getLines } from './store';
 import { connect } from 'react-redux';
-import Audio from './Audio';
-import ReactRoundPlayer from './ReactRoundPlayer';
+import Audio from './ReactRoundPlayer';
 
 class App extends Component {
   componentDidMount() {
@@ -21,7 +20,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         {/* <Route path='/' component={Navbar} /> */}
-        <Route path="/" component={ReactRoundPlayer} />
+        <Route path="/" component={Audio} />
         <Route exact path="/" component={Map} />
         {/* <Route path="/status" component={SubwayStatus} />
         {/* <Route path='/stops' component={Stops} /> */}
