@@ -45,7 +45,7 @@ const formatForMap = (trip, stops) => {
   };
 };
 
-router.get("/status/:category", async (req, res, next) => {
+router.get('/status/:category', async (req, res, next) => {
   try {
     const result = await mta.status(req.params.category);
     res.send(result);
@@ -54,7 +54,7 @@ router.get("/status/:category", async (req, res, next) => {
   }
 });
 
-router.get("/stops", async (req, res, next) => {
+router.get('/stops', async (req, res, next) => {
   try {
     const stops = await mta.stop();
     res.send(stops);
@@ -63,7 +63,7 @@ router.get("/stops", async (req, res, next) => {
   }
 });
 
-router.get("/display", async (req, res, next) => {
+router.get('/display', async (req, res, next) => {
   try {
     const routes = await Routes.findAll();
   } catch (err) {
@@ -71,7 +71,7 @@ router.get("/display", async (req, res, next) => {
   }
 });
 
-router.get("/routes", async (req, res, next) => {
+router.get('/routes', async (req, res, next) => {
   try {
     const routes = await Route.findAll();
     const allLines = routes
@@ -87,7 +87,7 @@ router.get("/routes", async (req, res, next) => {
   }
 });
 
-router.get("/schedule/", async (req, res, next) => {
+router.get('/schedule/', async (req, res, next) => {
   // this endpoint gets all stops, then we get all lines and we combine them make our Route model
   try {
     let routes = [];
@@ -123,7 +123,7 @@ router.get("/schedule/", async (req, res, next) => {
           line: [],
         }; //here we initialize the lineJson to later write it to the database
         var requestSettings = {
-          method: "GET",
+          method: 'GET',
           url: routeUrl,
           encoding: null,
           headers: { "x-api-key": "R3mKf9CSXg6LrjjJ79n4H57EjY1apVGl8MiyhRvY" },

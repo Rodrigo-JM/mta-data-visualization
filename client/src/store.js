@@ -100,7 +100,7 @@ const gotStops = (stops) => {
 
 export const getStops = () => {
   return async function (dispatch) {
-    const { data } = await axios.get("/api/stops");
+    const { data } = await axios.get('/api/stops');
     dispatch(gotStops(data));
   };
 };

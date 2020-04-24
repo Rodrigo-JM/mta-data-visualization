@@ -8,5 +8,6 @@ app.use(express.json())
 app.use('/api', apiRouter)
 // db.sync();
 db.sync()
-app.listen(8080)
+app.listen(8000)
+
 
