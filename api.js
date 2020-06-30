@@ -6,7 +6,7 @@ const Sequelize = require("sequelize");
 const router = require("express").Router();
 const Mta = require("mta-gtfs");
 const mta = new Mta({
-  key: "R3mKf9CSXg6LrjjJ79n4H57EjY1apVGl8MiyhRvY", // optional, default = 1
+  key: "MAxPzQSbSOatYtDKcRUpS68yHqRS4GcY9JyhPcoK", // optional, default = 1
 });
 
 const formatForMap = (trip, stops) => {
@@ -126,7 +126,7 @@ router.get('/schedule/', async (req, res, next) => {
           method: 'GET',
           url: routeUrl,
           encoding: null,
-          headers: { "x-api-key": "R3mKf9CSXg6LrjjJ79n4H57EjY1apVGl8MiyhRvY" },
+          headers: { "x-api-key": "MAxPzQSbSOatYtDKcRUpS68yHqRS4GcY9JyhPcoK" },
         };
 
         await requestPromise(requestSettings, async function (

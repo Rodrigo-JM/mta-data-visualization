@@ -48,7 +48,7 @@ const gotLines = (lines) => {
 export const getLines = () => {
   return async function (dispatch) {
     const { data } = await axios.get("/api/routes");
-    // console.log(data);
+    console.log(data);
     const allLines = data.reduce((lines, line) => {
       let lineResult =  {
         vendor: line.vendor,
