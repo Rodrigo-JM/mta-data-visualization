@@ -1,8 +1,6 @@
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
-var request = require("request");
 const requestPromise = require("request-promise");
 const { db, Route } = require("./db/db");
-const Sequelize = require("sequelize");
 const router = require("express").Router();
 const Mta = require("mta-gtfs");
 const mta = new Mta({
@@ -65,7 +63,7 @@ router.get('/stops', async (req, res, next) => {
 
 router.get('/display', async (req, res, next) => {
   try {
-    const routes = await Routes.findAll();
+    const routes = await Route.findAll();
   } catch (err) {
     next(err);
   }
